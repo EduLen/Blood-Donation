@@ -61,7 +61,7 @@ PRIMARY KEY (idproducto)
 );
 -- INSERT INTO `registrodonantessangre`.`productos` (`nombre`, `cantidad`) VALUES ('Sangre', '10'); -- agregar en un procedimiento de almacenado
 select * from productos;
-
+Drop TABLE productos;
 
 
 
@@ -69,9 +69,8 @@ CREATE TABLE Almacen (
 	id_almacen int not null auto_increment,
     nombre varchar(255), 
     cantidad int,
-    idproducto INT ,
-	PRIMARY KEY(id_almacen),
-    foreign key (idproducto) references productos(idproducto)
+   
+	PRIMARY KEY(id_almacen)
 );
 SELECT * FROM Almacen;
 
@@ -152,7 +151,7 @@ CREATE TABLE Donacion(
 	idDonacion INT AUTO_INCREMENT NOT NULL,
     donante_id int not null,
     codigo int,
-    idproducto INT,
+   -- idproducto INT,
     centro_donacion_id int not null,
     fecha_donacion Date not null,
     cantidad int, -- manejarlas en ml
@@ -162,7 +161,7 @@ CREATE TABLE Donacion(
 	PRIMARY KEY(idDonacion) ,
     foreign key (donante_id) references Datos_Personales(id),
     foreign key (centro_donacion_id) references Hospitales (id_hospitales),
-     foreign key(idproducto) references productos(idproducto)
+   -- foreign key(idproducto) references productos(idproducto)
 	-- foreign key(id) references Datos_Personales(id),
 	-- foreign key(idSangre) references TipoSangre(idSangre),
     -- foreign key(idBolsa) references Bolsa_sangre(Id_Bolsa),
@@ -171,8 +170,8 @@ CREATE TABLE Donacion(
 SELECT * FROM  Donacion; 
 Drop Table if exists Donacion;
 
-Drop table IF EXISTS producto;
-
+Drop table  producto;
+SHOW TABLES;
 /*
 SAUL LAGOS MORENO
 EDUARDO LENIN CRUZ
