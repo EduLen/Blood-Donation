@@ -19,8 +19,7 @@ Create Table Datos_Personales( -- donantes
     genero char(2) not null,
 	primary key (id)
 );
-Select * from Datos_Personales;
-Drop table Datos_Personales;
+
 
 Create Table Datos_Sangre(
 idSangre int not null AUTO_INCREMENT,
