@@ -88,3 +88,4 @@ CREATE TABLE Exportacion(
 );
 -- arreglar y relacionar
 -- _____________________________________________
+ show tables;
