@@ -11,7 +11,7 @@ Use RegistroDonantesSangre;
 -- DROP TABLE IF EXISTS Datos_Personales;
 Create Table Datos_Personales( -- donantes
 	id INT NOT NULL AUTO_INCREMENT,
-	cedula Varchar (16) not null UNIQUE ,
+	cedula Varchar (16) not null UNIQUE,
 	nombre Varchar(255) Not null,
 	apellido Varchar(255) Not null,
 	fecha_nacimiento Date not null,
@@ -20,15 +20,16 @@ Create Table Datos_Personales( -- donantes
 	primary key (id)
 );
 Select * from Datos_Personales;
+Drop table Datos_Personales;
 
 Create Table Datos_Sangre(
 idSangre int not null AUTO_INCREMENT,
 idPersona int not null, 
-tipoSangre VARCHAR (3) not null, --mandar a tabla donacion o almacen?
+tipoSangre VARCHAR (3) not null, 
 primary key (idSangre),
 foreign key(idPersona) references Datos_Personales(id)
 );
-
+--tipo sangre mandar a tabla donacion o almacen?
 
 CREATE TABLE Departamento(
 	id_Departamento INT NOT NULL auto_increment,
