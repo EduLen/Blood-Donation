@@ -29,14 +29,14 @@ CALL insertar_Datos_Personales('121-060404-1004G', 'Eduardo', 'Cruz', '2004-04-0
 DELIMITER $$
 CREATE PROCEDURE consultar_datos_personales(IN idPersona INT)
 BEGIN 
-IF(idPersona = 0) THEN
+IF IS NULL THEN
    SELECT * FROM Datos_Personales;
    ELSE
       SELECT * FROM Datos_Personales WHERE id = idPersona;
       END IF;
    END$$
      call consultar_datos_personales(1);
-     
+          call consultar_datos_personales(null);
    
    -- Eliminar datos personales
    DELIMITER $$ 
@@ -80,13 +80,16 @@ CREATE PROCEDURE consultar_datos_sangre(IN idPersona INT)
 BEGIN 
 DECLARE EXIT HANDLER FOR SQLEXCEPTION
                     BEGIN
-					ROLLBACK;
-				SELECT "Error: no se pudo consultar los datos";
-				END;
-
-      SELECT * FROM Datos_Sangre WHERE id = idPersona;
+		        ROLLBACK;
+	        	SELECT "Error: no se pudo consultar los datos";
+		    END;
+IF idPersona IS NULL THEN
+ SELECT * FROM Datos_Sangre;
+ ELSE 
+  SELECT * FROM Datos_Sangre WHERE id = idPersona;
    END$$
    call consultar_datos_sangre(1);
+    call consultar_datos_sangre(NULL);
    
    
    --Eliminar datos en sangre
