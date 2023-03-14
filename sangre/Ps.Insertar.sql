@@ -70,16 +70,17 @@ CALL insertar_Centro_Donacion("Hospital San Juan De Dios", @mensaje);
 
 -- Insertar en tabla donacion
 DELIMITER $$
-CREATE PROCEDURE insertar_Donacion( IN pid_donante int, IN pfecha_Donacion DATE, IN pcantidad_ml int,OUT pmensaje varchar(200))
+CREATE PROCEDURE insertar_Donacion( pid_Selector int, IN pid_donante int, IN pfecha_Donacion DATE, IN pcantidad_ml int,OUT pmensaje varchar(200))
         BEGIN
                     DECLARE EXIT HANDLER FOR SQLEXCEPTION
                          ROLLBACK;
                         SELECT 'Error: no se pudo insertar los datos de la donacion';
                     END;
                 START TRANSACTION;
-                INSERT INTO Donacion(id_donante, id_Centro_Donacion, fecha_Donacion, codigo, cantidad_ml ) VALUES (
-                                                          pid_donante,
-                                                         (SELECT id_Centro_Donacion FROM Centro_Donacion Where id_Centro_Donacion = pid_donante),
+                INSERT INTO Donacion(id_Selector, id_donante, id_Centro_Donacion, fecha_Donacion, codigo, cantidad_ml ) VALUES (
+                                                         |pid_Selector,
+                                                         (SELECT id From Datos_Personales WHERE id = pid_Selector),
+                                                         (SELECT id_Centro_Donacion FROM Centro_Donacion Where id_Centro_Donacion = pid_Selector),
                                                           pfecha_Donacion,
                                                          (ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 0.5)),
                                                          pcantidad_ml

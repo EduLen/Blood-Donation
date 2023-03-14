@@ -51,6 +51,7 @@ CREATE TABLE Centro_Donacion(
 
 CREATE TABLE Donacion(
 	id_Donacion INT AUTO_INCREMENT NOT NULL,
+	id_Selector INT Not null,
     id_donante int not null,
     id_Centro_Donacion int not null,
     fecha_Donacion Date not null,
@@ -74,7 +75,7 @@ CREATE TABLE Almacen (
    PRIMARY KEY(id_Bolsa),
    Foreign Key (id_Donacion) REFERENCES Donacion(id_Donacion)
 );
-
+Drop table if EXISTS Almacen;
 CREATE TABLE Exportacion(
 	id_Exportacion INT NOT NULL auto_increment,
 	id_Bolsa int NOT NULL,
