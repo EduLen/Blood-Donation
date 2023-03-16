@@ -1,26 +1,24 @@
 Use RegistroDonantesSangre;	
--- VISTAS 
-CREATE VIEW ver_donaciones_hoy as
-SELECT * FROM Datos_Personales WHERE fechaDonacion = current_date();
+CREATE VIEW vista_datos_personales_tipo_sangre AS
+SELECT id, cedula, nombre, apellido, fecha_nacimiento, tipo_sangre, genero
+FROM Datos_Personales;
 
-CREATE VIEW ver_enfermedades as
-SELECT Datos_Personales.nombre, Enfermedades.Enfermedades
- FROM Datos_Personales INNER JOIN Enfermedades ON
- Datos_Personales.id = Enfermedades.id_Enfermedades;
 
-CREATE VIEW ver_tipo_sangre as
-SELECT Datos_Personales.nombre, TipoSangre.tipoSangre
- FROM Datos_Personales INNER JOIN TipoSangre ON
- Datos_Personales.id = TipoSangre.idSangre;
 
-CREATE VIEW ver_sangre_especifica as
-SELECT Datos_Personales.nombre, TipoSangre.tipoSangre
- FROM Datos_Personales INNER JOIN TipoSangre ON
- Datos_Personales.id = TipoSangre.idSangre WHERE TipoSangre.tipoSangre = 'O+';
-
-CREATE VIEW ver_sangre_especifica_Onegativa as
-SELECT Datos_Personales.nombre, TipoSangre.tipoSangre
- FROM Datos_Personales INNER JOIN TipoSangre ON
- Datos_Personales.id = TipoSangre.idSangre WHERE TipoSangre.tipoSangre = 'O-';
+CREATE VIEW vista_donaciones_centro_donacion AS
+SELECT D.id_Donacion, CD.centro_Donacion, DP.nombre, DP.apellido, DP.tipo_sangre, D.fecha_Donacion, D.cantidad_ml
+FROM Donacion D
+INNER JOIN Datos_Personales DP ON D.id_donante = DP.id
+INNER JOIN Centro_Donacion CD ON D.id_Centro_Donacion = CD.id_Centro_Donacion;
  
+
+
+CREATE VIEW vista_bolsas_almacenadas AS
+SELECT A.id_Bolsa, A.tipo_sangre, A.cantidad_ml
+FROM Almacen A ;
+
+CREATE VIEW vista_exportaciones AS
+SELECT E.id_Exportacion, A.tipo_sangre, E.cantidad_bolsas, E.cantidad_ml, E.descripcion
+FROM Exportacion E
+INNER JOIN Almacen A ON E.id_Bolsa = A.id_Bolsa;
 -- FIN VISTAS 
