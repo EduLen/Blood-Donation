@@ -1,6 +1,6 @@
 Use RegistroDonantesSangre;	
 INSERT INTO Donacion(DonarDeNuevo) 
-SELECT DATE_ADD(fechaDonacion,INTERVAL 6 MONTH) FROM Datos_Personales WHERE id = 1;
+SELECT DATE_ADD(fechaDonacion,INTERVAL 6 MONTH) FROM Datos_Personales WHERE id_Datos_Personales = 1;
 
 -- trigger
 show triggers;

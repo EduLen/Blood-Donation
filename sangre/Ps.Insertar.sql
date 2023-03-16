@@ -29,7 +29,7 @@ BEGIN
 IF(idPersona = 0) THEN
    SELECT * FROM Datos_Personales;
    ELSE
-      SELECT * FROM Datos_Personales WHERE id = idPersona;
+      SELECT * FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
       END IF;
    END$$
      call consultar_datos_personales(1);
@@ -39,7 +39,7 @@ IF(idPersona = 0) THEN
    DELIMITER $$ 
 CREATE PROCEDURE eliminar_datos_personales(IN idPersona INT, OUT messageDelete VARCHAR(200))
 BEGIN
-DELETE FROM Datos_Personales WHERE id = idPersona;
+DELETE FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
 SET messageDelete = "Se ha eliminado la persona exitosamente";
 END$$ 
 call eliminar_datos_personales(1, @messageDelete);
@@ -53,7 +53,7 @@ BEGIN
 IF IS NULL THEN
    SELECT * FROM Datos_Personales;
    ELSE
-      SELECT * FROM Datos_Personales WHERE id = idPersona;
+      SELECT * FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
       END IF;
    END$$
      call consultar_datos_personales(1);
@@ -63,7 +63,7 @@ IF IS NULL THEN
    DELIMITER $$ 
 CREATE PROCEDURE eliminar_datos_personales(IN idPersona INT, OUT messageDelete VARCHAR(200))
 BEGIN
-DELETE FROM Datos_Personales WHERE id = idPersona;
+DELETE FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
 SET messageDelete = "Se ha eliminado la persona exitosamente";
 END$$ 
 call eliminar_datos_personales(1, @messageDelete);
@@ -102,7 +102,7 @@ DECLARE EXIT HANDLER FOR SQLEXCEPTION
 				SELECT "Error: no se pudo consultar los datos";
 				END;
 
-      SELECT * FROM Datos_Sangre WHERE id = idPersona;
+      SELECT * FROM Datos_Sangre WHERE id_Datos_Personales = idPersona;
    END$$
    call consultar_datos_sangre(1);
 
@@ -117,7 +117,7 @@ DECLARE EXIT HANDLER FOR SQLEXCEPTION
 				SELECT "Error: no se pudo eliminar los datos";
 				END;
 
-DELETE FROM TipoSangre WHERE id = idPersona;
+DELETE FROM TipoSangre WHERE id_Datos_Personales = idPersona;
 SET messageDelete = "Se han eliminado los datos exitosamente";
 END$$ 
 call eliminar_datos_sangre(1, @messageDelete);
@@ -171,7 +171,7 @@ DECLARE EXIT HANDLER FOR SQLEXCEPTION
 IF idPersona IS NULL THEN
  SELECT * FROM Datos_Sangre;
  ELSE 
-  SELECT * FROM Datos_Sangre WHERE id = idPersona;
+  SELECT * FROM Datos_Sangre WHERE id_Datos_Personales = idPersona;
    END$$
    call consultar_datos_sangre(1);
     call consultar_datos_sangre(NULL);
@@ -187,7 +187,7 @@ DECLARE EXIT HANDLER FOR SQLEXCEPTION
 				SELECT "Error: no se pudo eliminar los datos";
 				END;
 			
-DELETE FROM TipoSangre WHERE id = idPersona;
+DELETE FROM TipoSangre WHERE id_Datos_Personales = idPersona;
 SET messageDelete = "Se han eliminado los datos exitosamente";
 END$$ 
 call eliminar_datos_sangre(1, @messageDelete);
@@ -259,9 +259,9 @@ CREATE PROCEDURE insertar_Donacion( pid_Selector int, IN pid_donante int, IN pfe
                         SELECT 'Error: no se pudo insertar los datos de la donacion';
                     END;
                 START TRANSACTION;
-                INSERT INTO Donacion(id_Selector, id_donante, id_Centro_Donacion, fecha_Donacion, codigo, cantidad_ml ) VALUES (
+                INSERT INTO Donacion(id_Selector, id_Datos_Personales, id_Centro_Donacion, fecha_Donacion, codigo, cantidad_ml ) VALUES (
                                                          |pid_Selector,
-                                                         (SELECT id From Datos_Personales WHERE id = pid_Selector),
+                                                         (SELECT id_Datos_Personales From Datos_Personales WHERE id_Datos_Personales = pid_Selector),
                                                          (SELECT id_Centro_Donacion FROM Centro_Donacion Where id_Centro_Donacion = pid_Selector),
                                                           pfecha_Donacion,
                                                          (ROUND(UNIX_TIMESTAMP(CURTIME(4)) * 0.5)),
