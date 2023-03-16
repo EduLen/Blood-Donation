@@ -45,6 +45,31 @@ END$$
 call eliminar_datos_personales(1, @messageDelete);
 CALL insertar_Datos_Personales('121-060404-1004G', 'Eduardo', 'Cruz', '2004-04-06', '+O', 'M', @mensaje);
 
+
+-- Consultar en Datos Personales
+DELIMITER $$
+CREATE PROCEDURE consultar_datos_personales(IN idPersona INT)
+BEGIN 
+IF IS NULL THEN
+   SELECT * FROM Datos_Personales;
+   ELSE
+      SELECT * FROM Datos_Personales WHERE id = idPersona;
+      END IF;
+   END$$
+     call consultar_datos_personales(1);
+          call consultar_datos_personales(null);
+   
+   -- Eliminar datos personales
+   DELIMITER $$ 
+CREATE PROCEDURE eliminar_datos_personales(IN idPersona INT, OUT messageDelete VARCHAR(200))
+BEGIN
+DELETE FROM Datos_Personales WHERE id = idPersona;
+SET messageDelete = "Se ha eliminado la persona exitosamente";
+END$$ 
+call eliminar_datos_personales(1, @messageDelete);
+
+
+
 -- Insertar en datos de sangre
 
 DELIMITER $$
@@ -130,6 +155,78 @@ BEGIN
       INSERT INTO Municipio(municipio) VALUES(pmunicipio);
 END$$
 call insertar_departamento('Muy Muy');
+
+
+
+
+-- Consultar datos sangre
+DELIMITER $$
+CREATE PROCEDURE consultar_datos_sangre(IN idPersona INT)
+BEGIN 
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+		        ROLLBACK;
+	        	SELECT "Error: no se pudo consultar los datos";
+		    END;
+IF idPersona IS NULL THEN
+ SELECT * FROM Datos_Sangre;
+ ELSE 
+  SELECT * FROM Datos_Sangre WHERE id = idPersona;
+   END$$
+   call consultar_datos_sangre(1);
+    call consultar_datos_sangre(NULL);
+   
+   
+   --Eliminar datos en sangre
+      DELIMITER $$ 
+CREATE PROCEDURE eliminar_datos_sangre(IN idPersona INT, OUT messageDelete VARCHAR(200))
+BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+					ROLLBACK;
+				SELECT "Error: no se pudo eliminar los datos";
+				END;
+			
+DELETE FROM TipoSangre WHERE id = idPersona;
+SET messageDelete = "Se han eliminado los datos exitosamente";
+END$$ 
+call eliminar_datos_sangre(1, @messageDelete);
+
+
+-- INSERTAR EN DEPARTAMENTO
+DELIMITER $$
+CREATE PROCEDURE insertar_departamento(
+pdepartamento VARCHAR(255)
+)
+BEGIN
+ DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+					ROLLBACK;
+				SELECT "Error: no se pudo insertar los datos";
+				END;
+	  START TRANSACTION;
+      INSERT INTO departamento(departamento) VALUES(pdepartamento);
+END$$
+call insertar_departamento('Chontales');
+
+
+-- Insertar municipio
+DELIMITER $$
+CREATE PROCEDURE insertar_municipio(
+pmunicipio VARCHAR(255)
+)
+BEGIN
+ DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+					ROLLBACK;
+				SELECT "Error: no se pudo insertar los datos";
+				END;
+	  START TRANSACTION;
+      INSERT INTO Municipio(municipio) VALUES(pmunicipio);
+END$$
+call insertar_departamento('Muy Muy');
+
+
 
 
 -- Centro Donacion
