@@ -18,6 +18,9 @@ Create Table Datos_Personales(
 	primary key (id_Datos_Personales)
 );
 
+SELECT *
+FROM Datos_Personales;
+
 Create Table Datos_Sangre(
 id_Tipo_Sangre int not null AUTO_INCREMENT,
 id_Persona int not null, 
@@ -25,6 +28,7 @@ tipo_Sangre VARCHAR (3) not null,
 primary key (id_Tipo_Sangre),
 foreign key(id_Persona) references Datos_Personales(id_Datos_Personales)
 );
+SELECT * FROM Datos_Sangre;
 
 CREATE TABLE Departamento(
 	id_Departamento INT NOT NULL auto_increment,
@@ -35,6 +39,7 @@ CREATE TABLE Departamento(
 	FOREIGN KEY(id_Municipio) REFERENCES Municipio(id_Municipio),
 	FOREIGN KEY(id_Centro_Donacion) REFERENCES Centro_Donacion(id_Centro_Donacion)
 );
+SELECT * FROM Departamento;
 
 CREATE TABLE Municipio(
 	id_Municipio INT NOT NULL auto_increment,
@@ -43,12 +48,15 @@ CREATE TABLE Municipio(
 	PRIMARY KEY(id_Municipio),
 	FOREIGN KEY(id_Centro_Donacion) REFERENCES Centro_Donacion(id_Centro_Donacion)
 );
+SELECT * FROM Municipio;
 
 CREATE TABLE Centro_Donacion(
 	id_Centro_Donacion INT NOT NULL auto_increment,
 	centro_Donacion varchar(255),
 	PRIMARY KEY(id_Centro_Donacion)
 );
+
+SELECT * FROM Centro_Donacion;
 
 CREATE TABLE Donacion(
 	id_Donacion INT AUTO_INCREMENT NOT NULL, 
@@ -62,6 +70,8 @@ CREATE TABLE Donacion(
 	foreign key (id_Tipo_Sangre) references Datos_Sangre(id_Tipo_Sangre),
     foreign key (id_Centro_Donacion) references Centro_Donacion (id_Centro_Donacion)
 );
+
+SELECT * From Donacion;
 	-- este id_Datos_Personales de donante, nosotros en c# vamos a tener por ejemplo un datagrid con la lista de personas, 
 	-- vamos a hacer una busqueda de las personas, y una vez que seleccionemos esa persona, obtenemos su id_Datos_Personales
 -- manejarla cantidad en ml
