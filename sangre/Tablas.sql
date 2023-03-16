@@ -15,7 +15,7 @@ Create Table Datos_Personales( -- donantes
 	nombre Varchar(255) Not null,
 	apellido Varchar(255) Not null,
 	fecha_nacimiento Date not null,
-	tipo_sangre VARCHAR(5) NOT NULL,
+	tipo_sangre VARCHAR(5) NOT NULL, --agregar tabla
     genero char(2) not null,
 	primary key (id)
 );
@@ -50,9 +50,11 @@ CREATE TABLE Centro_Donacion(
 -- Buscar como relacionarlas 
 
 CREATE TABLE Donacion(
-	id_Donacion INT AUTO_INCREMENT NOT NULL,
-	id_Selector INT Not null,
-    id_donante int not null,
+	id_Donacion INT AUTO_INCREMENT NOT NULL, -- el autogenerado para cada donacion
+	id_Selector INT Not null, --
+	-- este id de donante, nosotros en c# vamos a tener por ejemplo un datagrid con la lista de personas, 
+	-- vamos a hacer una busqueda de las personas, y una vez que seleccionemos esa persona, obtenemos su id
+    id_donante int not null, 
     id_Centro_Donacion int not null,
     fecha_Donacion Date not null,
 	codigo int not null, 

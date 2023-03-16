@@ -24,7 +24,7 @@ DELIMITER ;
 
 -- Consultar en Datos Personales
 DELIMITER $$
-CREATE PROCEDURE consultar_datos_personales(IN idPersona INT)
+CREATE PROCEDURE consultar_datos_personales(IN idPersona = 0)
 BEGIN 
 IF(idPersona = 0) THEN
    SELECT * FROM Datos_Personales;
