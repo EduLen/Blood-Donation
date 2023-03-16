@@ -12,14 +12,11 @@ Use RegistroDonantesSangre;
 Create Table Datos_Personales( 
 	id_Datos_Personales INT NOT NULL AUTO_INCREMENT,
 	cedula Varchar (16) not null UNIQUE,
-	nombre Varchar(255) Not null,
-	apellido Varchar(255) Not null,
+	nombre_completo VARCHAR(255) not NULL,
 	fecha_nacimiento Date not null,
     genero char(2) not null,
 	primary key (id_Datos_Personales)
 );
-
-
 
 Create Table Datos_Sangre(
 id_Tipo_Sangre int not null AUTO_INCREMENT,
