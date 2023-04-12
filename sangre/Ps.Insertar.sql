@@ -1,3 +1,4 @@
+-- Insertar Datos personales
 DELIMITER $$
     CREATE PROCEDURE insertar_Datos_Personales(
         IN pcedula varchar(16), 
@@ -17,57 +18,70 @@ DELIMITER $$
                     VALUES ( pcedula, pnombre_completo, pfecha_nacimiento, pgenero);
                     set pmensaje = "Se ha insertado el registro de manera exitosa";
                 COMMIT;
-            END
-DELIMITER ;
-CALL insertar_Datos_Personales('121-060404-1004G', 'Eduardo Lenin Cruz López', '2004-04-06', '+O', @mensaje);
+            END 
+
+CALL insertar_Datos_Personales('121-060404-1004G', 'Lenin Eduardo López Cruz', '2004-08-24', 'M', @mensaje);
+
+-- Actualizar Datos personales 
+DELIMITER $$
+CREATE PROCEDURE actualizar_Datos_Personales(
+		IN pcedula varchar(16), 
+        IN pnombre_completo VARCHAR(255),   
+        IN pfecha_nacimiento Date,       
+        IN pgenero char(2),
+        OUT pmensaje varchar(200)      
+)
+	BEGIN
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION
+			BEGIN
+				ROLLBACK;
+					SELECT 'Error: no se pudo actualizar los datos de la persona';
+			END;
+		START TRANSACTION;
+		UPDATE Datos_Personales SET
+			cedula = pcedula,
+            nombre_completo = pnombre_completo,
+            fecha_nacimiento = pfecha_nacimiento,
+            genero = pgenero
+            WHERE cedula = pcedula ;
+		set pmensaje = "Se ha insertado el registro de manera exitosa";
+		COMMIT;
+    END
+CALL actualizar_Datos_Personales('121-060404-1005G', 'Eduardo Lenin Cruz López', '2004-08-24', 'M', @mensaje);
 
 -- Consultar en Datos Personales
 DELIMITER $$
-CREATE PROCEDURE consultar_datos_personales(IN idPersona = 0)
-BEGIN 
-IF(idPersona = 0) THEN
-   SELECT * FROM Datos_Personales;
-   ELSE
-      SELECT * FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
-      END IF;
-   END
-DELIMITER ;
-     call consultar_datos_personales(1);
+CREATE PROCEDURE consultar_Datos_Personales(IN pcedula varchar(16))
+	BEGIN 
+		IF pcedula IS NULL THEN
+			SELECT * FROM Datos_Personales;
+		ELSE
+			SELECT * FROM Datos_Personales WHERE cedula = pcedula;
+		END IF;
+    END
 
+
+CALL consultar_Datos_Personales(null);
+CALL consultar_Datos_Personales('121-060404-1004G');
 
    -- Eliminar datos personales
-   DELIMITER $$ 
-CREATE PROCEDURE eliminar_datos_personales(IN idPersona INT, OUT messageDelete VARCHAR(200))
-BEGIN
-DELETE FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
-SET messageDelete = "Se ha eliminado la persona exitosamente";
-END$$ 
-call eliminar_datos_personales(1, @messageDelete);
+DELIMITER $$ 
+CREATE PROCEDURE eliminar_Datos_Personales(
+	IN pcedula varchar(16),
+    OUT pmensaje VARCHAR(200))
+		BEGIN
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+			BEGIN
+				ROLLBACK;
+					SELECT 'Error: no se pudo eliminar los datos de la persona';
+			END;
+		START TRANSACTION;
+			DELETE FROM Datos_Personales WHERE cedula = pcedula; 
+            set pmensaje = "Se han eliminado los datos de manera exitosa";
+        COMMIT;
+        END
 
-
-
--- Consultar en Datos Personales
-DELIMITER $$
-CREATE PROCEDURE consultar_datos_personales(IN idPersona INT)
-BEGIN 
-IF IS NULL THEN
-   SELECT * FROM Datos_Personales;
-   ELSE
-      SELECT * FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
-      END IF;
-   END$$
-     call consultar_datos_personales(1);
-          call consultar_datos_personales(null);
-   
-   -- Eliminar datos personales
-   DELIMITER $$ 
-CREATE PROCEDURE eliminar_datos_personales(IN idPersona INT, OUT messageDelete VARCHAR(200))
-BEGIN
-DELETE FROM Datos_Personales WHERE id_Datos_Personales = idPersona;
-SET messageDelete = "Se ha eliminado la persona exitosamente";
-END$$ 
-call eliminar_datos_personales(1, @messageDelete);
-
+CALL eliminar_Datos_Personales('121-060404-1004G', @mensaje);
 
 
 -- Insertar en datos de sangre
