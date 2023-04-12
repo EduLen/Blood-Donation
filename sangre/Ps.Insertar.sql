@@ -84,56 +84,87 @@ CREATE PROCEDURE eliminar_Datos_Personales(
 CALL eliminar_Datos_Personales('121-060404-1004G', @mensaje);
 
 
+-- --------------------------
+-- Procediminetos Tipo Sangre
+-- --------------------------
 -- Insertar en datos de sangre
-
-DELIMITER $$
+DELIMITER $$ 
 CREATE PROCEDURE insertar_Datos_Sangre(
     IN pid_Persona INT,
     IN ptipo_Sangre varchar(3),
     OUT pmensaje varchar(200))
         BEGIN
             DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-                         ROLLBACK;
-                        SELECT 'Error: no se pudo insertar los datos de la sangre';
-                    END;
+				BEGIN
+					ROLLBACK;
+					SELECT 'Error: no se pudo insertar los datos de la sangre';
+				END;
             START TRANSACTION;
                 INSERT INTO Datos_Sangre(id_Persona, tipo_Sangre) VALUES (pid_Persona, ptipo_Sangre);
                 set pmensaje = "Se ha insertado los datos de la sangre de manera exitosa";
             COMMIT;
         END
-DELIMITER ;
-CALL insertar_Datos_Sangre('1', '+O', @mensaje);
+
+CALL insertar_Datos_Sangre('1', '-O', @mensaje);
+
+-- Actualizar Datos Sangre
+DELIMITER $$
+CREATE PROCEDURE actualizar_Datos_Sangre(
+	IN pid_Tipo_Sangre int,
+	IN pid_Persona int, 
+	IN ptipo_Sangre VARCHAR (3),
+	OUT pmensaje varchar(200)      
+)
+	BEGIN
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION
+			BEGIN
+				ROLLBACK;
+					SELECT 'Error: no se pudo actualizar los datos de la sangre';
+			END;
+		START TRANSACTION;
+		UPDATE Datos_Sangre SET
+			id_Persona  = pid_Persona ,
+            tipo_Sangre = ptipo_Sangre
+            WHERE id_Tipo_Sangre = pid_Tipo_Sangre  ;
+		set pmensaje = "Se han actualizado los datos de manera exitosa";
+		COMMIT;
+    END
+    
+CALL  actualizar_Datos_Sangre('2', '1', '+AB', @mensaje)
 
 -- Consultar datos sangre
 DELIMITER $$
-CREATE PROCEDURE consultar_datos_sangre(IN idPersona INT)
-BEGIN 
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-					ROLLBACK;
-				SELECT "Error: no se pudo consultar los datos";
-				END;
+CREATE PROCEDURE consultar_Datos_Sangre(IN pid_Tipo_Sangre int)
+	BEGIN 
+		IF pid_Tipo_Sangre IS NULL THEN
+			SELECT * FROM Datos_Sangre;
+		ELSE
+			SELECT * FROM Datos_Sangre WHERE id_Tipo_Sangre = pid_Tipo_Sangre;
+		END IF;
+    END
+call consultar_Datos_Sangre(null);
+call consultar_Datos_Sangre(1);
 
-      SELECT * FROM Datos_Sangre WHERE id_Datos_Personales = idPersona;
-   END$$
-   call consultar_datos_sangre(1);
 
+-- Eliminar datos en sangre
 
-   --Eliminar datos en sangre
-      DELIMITER $$ 
-CREATE PROCEDURE eliminar_datos_sangre(IN idPersona INT, OUT messageDelete VARCHAR(200))
-BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-					ROLLBACK;
-				SELECT "Error: no se pudo eliminar los datos";
-				END;
+DELIMITER $$ 
+CREATE PROCEDURE eliminar_Datos_Sangre(
+	IN pid_Tipo_Sangre int,
+    OUT pmensaje VARCHAR(200))
+		BEGIN
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+			BEGIN
+				ROLLBACK;
+				SELECT 'Error: no se pudo eliminar los datos de la sangre';
+			END;
+		START TRANSACTION;
+			DELETE FROM Datos_Sangre WHERE id_Tipo_Sangre = pid_Tipo_Sangre; 
+            set pmensaje = "Se han eliminado los datos de manera exitosa";
+        COMMIT;
+        END
+call eliminar_datos_sangre(1, @mensaje);
 
-DELETE FROM TipoSangre WHERE id_Datos_Personales = idPersona;
-SET messageDelete = "Se han eliminado los datos exitosamente";
-END$$ 
-call eliminar_datos_sangre(1, @messageDelete);
 
 
 -- INSERTAR EN DEPARTAMENTO
