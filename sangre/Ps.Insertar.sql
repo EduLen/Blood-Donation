@@ -76,7 +76,9 @@ CREATE PROCEDURE eliminar_Datos_Personales(
 					SELECT 'Error: no se pudo eliminar los datos de la persona';
 			END;
 		START TRANSACTION;
-			DELETE FROM Datos_Personales WHERE cedula = pcedula; 
+			UPDATE Datos_Personales SET
+			estado = pestado
+			WHERE cedula = pcedula; 
             set pmensaje = "Se han eliminado los datos de manera exitosa";
         COMMIT;
         END
