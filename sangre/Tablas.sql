@@ -12,7 +12,8 @@ Create Table Datos_Personales(
 	cedula Varchar (16) not null UNIQUE,
 	nombre_completo VARCHAR(255) not NULL,
 	fecha_nacimiento Date not null,
-    genero char(2) not null,
+    	estado varchar(10) default 'Activo',
+	genero char(2) not null,
 	primary key (id_Datos_Personales)
 );
 
