@@ -260,4 +260,11 @@ DELIMITER ;
 Call insertar_Donacion('1','1','1', '2023-03-12', '500', @mensaje);
 DROP Procedure if EXISTS insertar_Donacion;
 
+
+DELIMITER $$
+CREATE FUNCTION cacularFecha(fecha DATE) RETURNS DATE
+BEGIN 
+RETURN ADDDATE(CURDATE(), Interval 6 MONTH);
+END$$
+DELIMITER ;
 --Arreglar esto
