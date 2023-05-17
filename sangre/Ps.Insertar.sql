@@ -1,37 +1,15 @@
--- Insertar Datos personales
 DELIMITER $$
-    CREATE PROCEDURE insertar_Datos_Personales(
-        IN pcedula varchar(16), 
+CREATE DEFINER=`educruz`@`%` PROCEDURE `actualizar_Datos_Personales`(
+		IN pid_Datos_Personales INT,
+        IN pid_Sangre INT,
+		IN pcedula varchar(16),
         IN pnombre_completo VARCHAR(255),   
-        IN pfecha_nacimiento Date,       
-        IN pgenero char(2),
-        OUT pmensaje varchar(200))
-            BEGIN
-                DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-                         ROLLBACK;
-                        SELECT 'Error: no se pudo insertar los datos de la persona';
-                    END;
-                START TRANSACTION;
-                
-                    INSERT INTO Datos_Personales(cedula, nombre_completo, fecha_nacimiento, genero) 
-                    VALUES ( pcedula, pnombre_completo, pfecha_nacimiento, pgenero);
-                    set pmensaje = "Se ha insertado el registro de manera exitosa";
-                COMMIT;
-            END 
-
-CALL insertar_Datos_Personales('121-060404-1004G', 'Lenin Eduardo López Cruz', '2004-08-24', 'M', @mensaje);
-
--- Actualizar Datos personales 
-DELIMITER $$
-CREATE PROCEDURE actualizar_Datos_Personales(
-		IN pcedula varchar(16), 
-        IN pnombre_completo VARCHAR(255),   
+        IN pnumero varchar(12),
         IN pfecha_nacimiento Date,       
         IN pgenero char(2),
         OUT pmensaje varchar(200)      
 )
-	BEGIN
+BEGIN
 		DECLARE EXIT HANDLER FOR SQLEXCEPTION
 			BEGIN
 				ROLLBACK;
@@ -39,37 +17,72 @@ CREATE PROCEDURE actualizar_Datos_Personales(
 			END;
 		START TRANSACTION;
 		UPDATE Datos_Personales SET
+			id_Sangre = pid_Sangre,
 			cedula = pcedula,
             nombre_completo = pnombre_completo,
+            numero = pnumero,
             fecha_nacimiento = pfecha_nacimiento,
             genero = pgenero
-            WHERE cedula = pcedula ;
-		set pmensaje = "Se ha insertado el registro de manera exitosa";
+            WHERE id_Datos_Personales  = pid_Datos_Personales  ;
+		set pmensaje = "Se ha actualizado correctamente";
 		COMMIT;
-    END
-CALL actualizar_Datos_Personales('121-060404-1005G', 'Eduardo Lenin Cruz López', '2004-08-24', 'M', @mensaje);
+    END$$
+DELIMITER ;
 
--- Consultar en Datos Personales
 DELIMITER $$
-CREATE PROCEDURE consultar_Datos_Personales(IN pcedula varchar(16))
-	BEGIN 
+CREATE DEFINER=`educruz`@`%` PROCEDURE `ActualizarDonacion`(
+    IN donacion_id INT,
+    IN nuevo_analisis VARCHAR(100),
+    IN motivo_rechazo TEXT,
+    IN pmensaje VARCHAR(200)
+)
+BEGIN
+	DECLARE EXIT  HANDLER  FOR  SQLEXCEPTION
+                BEGIN
+					SET pmensaje= "ERROR: No se pudieron realizar los cambios";
+                END;
+                START TRANSACTION;
+    -- Insertar la donación en la tabla "Donaciones_Desechadas" si es "Rechazado"
+    IF nuevo_analisis = 'Rechazado' THEN
+        INSERT INTO Donaciones_Desechadas (id_Datos_Personales, idDonacion, motivo)
+        SELECT dp.id_Datos_Personales, d.id_Donacion, motivo_rechazo
+        FROM Donacion d
+        INNER JOIN Datos_Personales dp ON d.id_Datos_Personales = dp.id_Datos_Personales
+        WHERE d.id_Donacion = donacion_id;
+    END IF;
+					SET pmensaje = "Se han realizado los cambios correctamente ";
+				COMMIT;
+    -- Actualizar la columna "analisis" en la tabla "Donacion"
+    UPDATE Donacion SET analisis = "Examinado" WHERE id_Donacion = donacion_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `consultar_Datos_Personales`(IN pcedula varchar(16))
+BEGIN 
 		IF pcedula IS NULL THEN
 			SELECT * FROM Datos_Personales;
 		ELSE
 			SELECT * FROM Datos_Personales WHERE cedula = pcedula;
 		END IF;
-    END
+    END$$
+DELIMITER ;
 
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `donaciones_Sin_Analizar`(
+	
+)
+BEGIN
+					SELECT * FROM vista_donaciones WHERE analisis = "Sin Analizar";  
+    END$$
+DELIMITER ;
 
-CALL consultar_Datos_Personales(null);
-CALL consultar_Datos_Personales('121-060404-1004G');
-
-   -- Eliminar datos personales
-DELIMITER $$ 
-CREATE PROCEDURE eliminar_Datos_Personales(
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `eliminar_Datos_Personales`(
 	IN pcedula varchar(16),
+    IN pestado varchar(10),
     OUT pmensaje VARCHAR(200))
-		BEGIN
+BEGIN
 			DECLARE EXIT HANDLER FOR SQLEXCEPTION
 			BEGIN
 				ROLLBACK;
@@ -78,193 +91,145 @@ CREATE PROCEDURE eliminar_Datos_Personales(
 		START TRANSACTION;
 			UPDATE Datos_Personales SET
 			estado = pestado
-			WHERE cedula = pcedula; 
-            set pmensaje = "Se han eliminado los datos de manera exitosa";
+            WHERE cedula = pcedula; 
+            set pmensaje = "Se han eliminado los datos correctamente";
         COMMIT;
-        END
-
-CALL eliminar_Datos_Personales('121-060404-1004G', @mensaje);
-
-
--- --------------------------
--- Procediminetos Tipo Sangre
--- --------------------------
--- Insertar en datos de sangre
-DELIMITER $$ 
-CREATE PROCEDURE insertar_Datos_Sangre(
-    IN pid_Persona INT,
-    IN ptipo_Sangre varchar(3),
-    OUT pmensaje varchar(200))
-        BEGIN
-            DECLARE EXIT HANDLER FOR SQLEXCEPTION
-				BEGIN
-					ROLLBACK;
-					SELECT 'Error: no se pudo insertar los datos de la sangre';
-				END;
-            START TRANSACTION;
-                INSERT INTO Datos_Sangre(id_Persona, tipo_Sangre) VALUES (pid_Persona, ptipo_Sangre);
-                set pmensaje = "Se ha insertado los datos de la sangre de manera exitosa";
-            COMMIT;
-        END
-
-CALL insertar_Datos_Sangre('1', '-O', @mensaje);
-
--- Actualizar Datos Sangre
-DELIMITER $$
-CREATE PROCEDURE actualizar_Datos_Sangre(
-	IN pid_Tipo_Sangre int,
-	IN pid_Persona int, 
-	IN ptipo_Sangre VARCHAR (3),
-	OUT pmensaje varchar(200)      
-)
-	BEGIN
-		DECLARE EXIT HANDLER FOR SQLEXCEPTION
-			BEGIN
-				ROLLBACK;
-					SELECT 'Error: no se pudo actualizar los datos de la sangre';
-			END;
-		START TRANSACTION;
-		UPDATE Datos_Sangre SET
-			id_Persona  = pid_Persona ,
-            tipo_Sangre = ptipo_Sangre
-            WHERE id_Tipo_Sangre = pid_Tipo_Sangre  ;
-		set pmensaje = "Se han actualizado los datos de manera exitosa";
-		COMMIT;
-    END
-    
-CALL  actualizar_Datos_Sangre('2', '1', '+AB', @mensaje)
-
--- Consultar datos sangre
-DELIMITER $$
-CREATE PROCEDURE consultar_Datos_Sangre(IN pid_Tipo_Sangre int)
-	BEGIN 
-		IF pid_Tipo_Sangre IS NULL THEN
-			SELECT * FROM Datos_Sangre;
-		ELSE
-			SELECT * FROM Datos_Sangre WHERE id_Tipo_Sangre = pid_Tipo_Sangre;
-		END IF;
-    END
-call consultar_Datos_Sangre(null);
-call consultar_Datos_Sangre(1);
-
-
--- Eliminar datos en sangre
-
-DELIMITER $$ 
-CREATE PROCEDURE eliminar_Datos_Sangre(
-	IN pid_Tipo_Sangre int,
-    OUT pmensaje VARCHAR(200))
-		BEGIN
-			DECLARE EXIT HANDLER FOR SQLEXCEPTION
-			BEGIN
-				ROLLBACK;
-				SELECT 'Error: no se pudo eliminar los datos de la sangre';
-			END;
-		START TRANSACTION;
-			DELETE FROM Datos_Sangre WHERE id_Tipo_Sangre = pid_Tipo_Sangre; 
-            set pmensaje = "Se han eliminado los datos de manera exitosa";
-        COMMIT;
-        END
-call eliminar_datos_sangre(1, @mensaje);
-
-
-
--- INSERTAR EN DEPARTAMENTO
-DELIMITER $$
-
-
-
-
-
--- INSERTAR EN DEPARTAMENTO
-DELIMITER $$
-CREATE PROCEDURE insertar_departamento(
-    IN pid_Municipio int,
-    IN Pid_Centro_Donacion INT,
-    pdepartamento VARCHAR(255)
-    )
-BEGIN
- DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-					ROLLBACK;
-				SELECT "Error: no se pudo insertar los datos";
-				END;
-	  START TRANSACTION;
-      INSERT INTO departamento(id_Municipio, id_Centro_Donacion, departamento) VALUES(pid_Municipio, Pid_Centro_Donacion, pdepartamento);
-    END
+        END$$
 DELIMITER ;
-call insertar_departamento('1','1','Esteli');
-
-
--- Insertar municipio
-DELIMITER $$
-CREATE PROCEDURE insertar_municipio(
-    IN pid_Centro_Donacion int,
-    IN pmunicipio VARCHAR(255)
-    )
-        BEGIN
-            DECLARE EXIT HANDLER FOR SQLEXCEPTION
-                    BEGIN
-					ROLLBACK;
-				SELECT "Error: no se pudo insertar los datos";
-				END;
-	  START TRANSACTION;
-      INSERT INTO Municipio(id_Centro_Donacion, municipio) VALUES(pid_Centro_Donacion, pmunicipio);
-    END
-DELIMITER ;
-call insertar_municipio('1','Esteli');
-
-
-
-
--- Centro Donacion
 
 DELIMITER $$
-CREATE PROCEDURE insertar_Centro_Donacion(
+CREATE DEFINER=`educruz`@`%` PROCEDURE `insertar_Centro_Donacion`(
+    IN pid_Departamento int,
+    IN Pid_Municipio INT,
     IN pcentro_Donacion varchar(255),
     OUT pmensaje varchar(200))
-    BEGIN
+BEGIN
         DECLARE EXIT HANDLER FOR SQLEXCEPTION
                     BEGIN
                          ROLLBACK;
-                        SELECT 'Error: no se pudo insertar los datos del centro de salud';
+                        SELECT 'Error: no se pudo insertar el centro de salud';
                     END;
                 START TRANSACTION;
-                INSERT INTO Centro_Donacion(centro_Donacion) VALUES (pcentro_Donacion);
-                set pmensaje = "Se ha insertado los datos de la centro de salud de manera exitosa";
+                INSERT INTO Centro_Donacion(id_Departamento, id_Municipio, centro_Donacion) VALUES (pid_Departamento, pid_Municipio, pcentro_Donacion);
+                set pmensaje = "Se ha insertado correctamente";
             COMMIT;
-    END
+    END$$
 DELIMITER ;
 
-CALL insertar_Centro_Donacion("Hospital San Juan De Dios", @mensaje);
-
--- Insertar en tabla donacion
 DELIMITER $$
-CREATE PROCEDURE insertar_Donacion(
+CREATE DEFINER=`educruz`@`%` PROCEDURE `insertar_Datos_Personales`(
+        IN pcedula varchar(16), 
+        IN pnombre_completo VARCHAR(255),
+        IN pfecha_nacimiento Date,
+        IN pgenero char(2),
+        IN pid_sangre INT,
+        IN pnumero VARCHAR(15),
+        OUT pmensaje varchar(200))
+BEGIN
+                DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+                         ROLLBACK;
+                        set pmensaje = 'Error: no se pudo insertar los datos de la persona';
+                    END;
+                START TRANSACTION;
+
+                    INSERT INTO Datos_Personales(cedula, nombre_completo, fecha_nacimiento, genero, id_Sangre, numero) 
+                    VALUES ( pcedula, pnombre_completo, pfecha_nacimiento, pgenero, pid_sangre, pnumero);
+                    set pmensaje = "Se ha insertado el registro de manera exitosa";
+                COMMIT;
+            END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `insertar_Donacion`(
     IN pid_Datos_Personales int,
-    IN pid_Tipo_Sangre int,
     IN pid_Centro_Donacion int,
     IN pfecha_Donacion DATE, 
     IN pcantidad_ml int,
     OUT pmensaje varchar(200))
-            BEGIN
-                  
-                
-                INSERT INTO Donacion( id_Datos_Personales, id_Tipo_Sangre, id_Centro_Donacion, fecha_Donacion, cantidad_ml ) VALUES
-                                    ( pid_Datos_Personales, pid_Tipo_Sangre, pid_Centro_Donacion, pfecha_Donacion, pcantidad_ml);
-                set pmensaje = "Se ha insertado los datos de la donacion de manera exitosa";
-           
-            END
+BEGIN           
+             DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN
+                       
+                        set pmensaje = 'Error: no se pudo insertar la donacion';
+                          ROLLBACK;
+                    END;
+                START TRANSACTION;
+                BEGIN
+                DECLARE getDate varchar(15);
+                             SELECT MAX(donar_de_nuevo) FROM Donacion WHERE id_Datos_Personales = (SELECT id_Datos_Personales FROM Datos_Personales WHERE                             id_Datos_Personales = pid_Datos_Personales) into getDate;
+         -- aqui va todo
+         
+                IF getDate IS NULL THEN
+                		        INSERT INTO Donacion( id_Datos_Personales, id_Centro_Donacion, fecha_Donacion, donar_de_nuevo, cantidad_ml) VALUES
+							    ( pid_Datos_Personales, pid_Centro_Donacion, pfecha_Donacion, calcularFecha(pfecha_Donacion), pcantidad_ml);
+                                 set pmensaje =  'Se inserto la donacion correctamente';
+                else
+				
+			
+                 
+                   IF  pfecha_Donacion < getDate THEN
+						        SET pmensaje = "Esta persona no puede donar porque no se ha cumplido el tiempo de recuperación";
+				   ELSE IF pfecha_Donacion > getDate THEN
+								INSERT INTO Donacion( id_Datos_Personales, id_Centro_Donacion, fecha_Donacion, donar_de_nuevo, cantidad_ml) VALUES
+							    ( pid_Datos_Personales, pid_Centro_Donacion, pfecha_Donacion, calcularFecha(pfecha_Donacion), pcantidad_ml);
+                                 set pmensaje =  'Se inserto la donacion correctamente';
+					END IF;
+END IF;         
+         
+				-- SET pmensaje = getDate;
+ 
+               END IF;
+                    COMMIT ;
+                END ;
+            END$$
 DELIMITER ;
 
-Call insertar_Donacion('1','1','1', '2023-03-12', '500', @mensaje);
-DROP Procedure if EXISTS insertar_Donacion;
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `vista_Donacion_p`(
+	IN pcedula Varchar (16),
+    IN pmensaje varchar(200)
+)
+BEGIN
+		DECLARE EXIT  HANDLER  FOR  SQLEXCEPTION
+                BEGIN
+					set pmensaje= "Error: Esta persona aun no ha donado.";
+                    ROLLBACK;
+                END;
+		START TRANSACTION;
+			    
+                select * From vista_donaciones WHERE cedula = pcedula;
+                set pmensaje = "Se encontro a la persona correctamente";
+        COMMIT;
+    END$$
+DELIMITER ;
 
 
 DELIMITER $$
-CREATE FUNCTION cacularFecha(fecha DATE) RETURNS DATE
-BEGIN 
-RETURN ADDDATE(CURDATE(), Interval 6 MONTH);
-END$$
+CREATE DEFINER=`educruz`@`%` PROCEDURE `vista_persona_c`(
+	IN pcedula Varchar (16),
+    IN pmensaje varchar(200)
+)
+BEGIN
+		DECLARE EXIT  HANDLER  FOR  SQLEXCEPTION
+                BEGIN
+					set pmensaje= "Error: Esta persona no se encuntra a esta persona.";
+                    ROLLBACK;
+                END;
+		START TRANSACTION;
+			    
+                select * From vista_personas_cedula WHERE cedula = pcedula;
+                set pmensaje = "Se encontro a la persona correctamente";
+        COMMIT;
+    END$$
 DELIMITER ;
 --Arreglar esto
+
+DELIMITER $$
+CREATE DEFINER=`educruz`@`%` FUNCTION `calcularFecha`(fecha DATE) RETURNS date
+    DETERMINISTIC
+BEGIN 
+		RETURN DATE_ADD(fecha, Interval 6 MONTH);
+	END$$
+DELIMITER ;
+
