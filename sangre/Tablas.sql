@@ -3,9 +3,7 @@ SAUL LAGOS MORENO
 EDUARDO LENIN CRUZ
 WILBER O'CONNELL RUIZ
 */
-DROP DATABASE IF EXISTS RegistroDonantesSangre;
-Create DataBase RegistroDonantesSangre;
-Use RegistroDonantesSangre;
+
 CREATE TABLE `Centro_Donacion` (
   `id_Centro_Donacion` int NOT NULL AUTO_INCREMENT,
   `id_Departamento` int NOT NULL,
@@ -80,6 +78,8 @@ CREATE TABLE `Municipio` (
   KEY `id_Departamento` (`id_Departamento`),
   CONSTRAINT `Municipio_ibfk_1` FOREIGN KEY (`id_Departamento`) REFERENCES `Departamento` (`id_Departamento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 
 
 
