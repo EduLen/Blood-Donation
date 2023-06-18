@@ -27,3 +27,11 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`educruz`@`%` SQL SECURITY DEFINER VIEW `vist
 AS `id_Datos_Personales`,`dp`.`cedula` AS `cedula`,`dp`.`nombre_completo` AS `nombre_completo`,`dp`.`fecha_nacimiento` 
 AS `fecha_nacimiento`,`dp`.`numero` AS `numero`,`dp`.`genero` AS `genero`,`dp`.`estado` AS `estado`,`ds`.`tipo_Sangre` 
 AS `Tipo_Sangre` from (`Datos_Personales` `dp` join `Datos_Sangre` `ds` on((`dp`.`id_Sangre` = `ds`.`id_Tipo_Sangre`)));
+
+
+CREATE VIEW vista_almacen AS
+SELECT a.id_Donacion, dp.nombre_completo, ds.tipo_Sangre, a.cantidad_ml
+FROM Almacen a
+JOIN Donacion d ON a.id_Donacion = d.id_Donacion
+JOIN Datos_Personales dp ON d.id_Datos_Personales = dp.id_Datos_Personales
+JOIN Datos_Sangre ds ON dp.id_Sangre = ds.id_Tipo_Sangre;
