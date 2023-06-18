@@ -79,6 +79,19 @@ CREATE TABLE `Municipio` (
   CONSTRAINT `Municipio_ibfk_1` FOREIGN KEY (`id_Departamento`) REFERENCES `Departamento` (`id_Departamento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE `Almacen` (
+  `id_Bolsa` int NOT NULL AUTO_INCREMENT,
+  `id_Donacion` int NOT NULL,
+  `id_Tipo_Sangre` int NOT NULL,
+  `cantidad_ml` int DEFAULT NULL,
+  PRIMARY KEY (`id_Bolsa`),
+  KEY `id_Donacion` (`id_Donacion`),
+  KEY `id_Tipo_Sangre` (`id_Tipo_Sangre`),
+  CONSTRAINT `Almacen_ibfk_1` FOREIGN KEY (`id_Donacion`) REFERENCES `Donacion` (`id_Donacion`),
+  CONSTRAINT `Almacen_ibfk_2` FOREIGN KEY (`id_Tipo_Sangre`) REFERENCES `Datos_Sangre` (`id_Tipo_Sangre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 CREATE TABLE Login(
 	id_Login INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     usser VARCHAR(255) NOT NULL UNIQUE ,
