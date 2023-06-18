@@ -233,3 +233,50 @@ BEGIN
 	END$$
 DELIMITER ;
 
+DELIMITER $$
+CREATE PROCEDURE new_usser(
+	IN p_usser VARCHAR(255),
+    IN P_password VARCHAR(15),
+    in pbusiness_position varchar(30),
+    OUT pmessage VARCHAR(200)
+)
+	BEGIN
+			DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN  
+                    ROLLBACK;
+                        set pmessage = 'Error: no se puede registrar el nuevo usuario';
+                    END;
+                START TRANSACTION;
+                    INSERT INTO Login(usser, usser_password, business_position ) 
+                    VALUES ( p_usser, p_password, pbusiness_position );
+                    set pmessage = "Se ha agregado un nuevo usuario";
+                COMMIT;
+    END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE update_usser(
+	IN p_id_Login INT,
+	IN p_usser VARCHAR(255),
+    IN P_password VARCHAR(15),
+    in pbusiness_position varchar(30),
+    OUT pmessage VARCHAR(200)
+)
+	BEGIN
+		DECLARE EXIT HANDLER FOR SQLEXCEPTION
+                    BEGIN  
+                    ROLLBACK;
+                        set pmessage = 'Error: no se puede actualizar usuario';
+                    END;
+		START TRANSACTION ;
+			UPDATE Login SET 
+            usser = p_usser,
+            usser_password = p_password,
+            business_position = pbusiness_position
+            WHERE id_Login = p_id_Login;
+            
+            set pmessage = 'Se ha actualizado este usuario';
+        COMMIT;
+    END $$
+DELIMITER ;
+
