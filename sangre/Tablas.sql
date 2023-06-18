@@ -79,7 +79,13 @@ CREATE TABLE `Municipio` (
   CONSTRAINT `Municipio_ibfk_1` FOREIGN KEY (`id_Departamento`) REFERENCES `Departamento` (`id_Departamento`)
 ) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
+CREATE TABLE Login(
+	id_Login INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    usser VARCHAR(255) NOT NULL UNIQUE ,
+    usser_password VARCHAR(15) not null,
+    business_position varchar(30) not null,
+    state varchar(10) NOT NULL DEFAULT 'Activo'
+);
 
 
 
