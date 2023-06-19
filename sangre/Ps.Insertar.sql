@@ -280,3 +280,11 @@ CREATE PROCEDURE update_usser(
     END $$
 DELIMITER ;
 
+
+DELIMITER $$
+CREATE PROCEDURE vista_Almacen()
+	BEGIN
+		SELECT * FROM vista_almacen;
+    	END$$
+DELIMITER ;
+
